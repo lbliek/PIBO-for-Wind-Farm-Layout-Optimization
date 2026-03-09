@@ -23,8 +23,8 @@ rho <- 0.1512 # from 2 * rotor diam / farm length = (2*126)/(333.33*5)
 # ***************************************************
 
 seeds <- 1:30           # seeds for independent runs
-kernel <- "gauss"         # GP's kernel (i.e., 'exp' and 'gauss' in the paper)
-lcb.beta <- 0           # beta for GP's LCB (i.e., we minimize the amount of generated power changed in sign)
+kernel <- "gauss"       # GP's kernel (i.e., 'exp' and 'gauss' in the paper)
+lcb.beta <- 6           # beta for GP's LCB (i.e., we minimize the amount of generated power changed in sign)
 RSsamples <- 10000      # LHS samples for inexact optimization of the acquisition function (GP-LCB)  
 n0 <- 2*m+1             # initial random solutions (i.e., 2*m+1 is the minimum required) to fit a GP)
 N <- 500                # total number of queries (including initial random solutions)
@@ -78,7 +78,7 @@ for( seed in seeds ) {
     evalTime <- Sys.time()
     tmp <- numeric()
     for( k in 1:nfereps )
-      tmp[k] <- permutation_invariant_objective(as.vector(P))
+      tmp[k] <- permutation_invariant_objective(as.vector(t(P)))
     evalTime <- difftime(Sys.time(),evalTime,units="secs")
     ys[i] <- min(tmp)
     
@@ -87,7 +87,7 @@ for( seed in seeds ) {
     # flows in terms of OT
     # *****************************************************************
     
-    Xs <- rbind( Xs, as.vector(P-P_) )
+    Xs <- rbind( Xs, as.vector(t(P-P_)) )
     
     # storing into the data frame
     RES[rowIx,] <- data.frame( seed=seed,
@@ -123,7 +123,7 @@ for( seed in seeds ) {
       
       # rescaling XX w.r.t. to the original search space of P!
       for( j in 1:ncol(XX) )
-        XX[,j] <- XX[,j]-as.vector(P_[j])
+        XX[,j] <- XX[,j]-as.vector(t(P_))[j]
       
       # selecting only feasible X
       feasibleIxs <- numeric() 
@@ -145,7 +145,7 @@ for( seed in seeds ) {
     X_next <- XX[which.min(aux$mean-lcb.beta*aux$sd),]
     
     # making X_next consistent with OT!
-    P <- P_ + matrix(X_next,m,2)
+    P <- P_ + matrix(X_next,m,2,byrow=T)
 
     
     # *****************************************************************
@@ -159,10 +159,10 @@ for( seed in seeds ) {
     evalTime <- Sys.time()
     tmp <- numeric()
     for( k in 1:nfereps )
-      tmp[k] <- permutation_invariant_objective(as.vector(P))
+      tmp[k] <- permutation_invariant_objective(as.vector(t(P)))
     evalTime <- difftime( Sys.time(), evalTime )
     
-    Xs <- rbind( Xs, as.vector(P-P_) )
+    Xs <- rbind( Xs, as.vector(t(P-P_)) )
     ys <- c(ys,min(tmp))
     
     

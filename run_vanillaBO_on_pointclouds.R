@@ -23,8 +23,8 @@ rho <- 0.1512 # from 2 * rotor diam / farm length = (2*126)/(333.33*5)
 # ***************************************************
 
 seeds <- 1:30           # seeds for independent runs
-kernel <- "gauss"         # GP's kernel (i.e., 'exp' and 'gauss' in the paper)
-lcb.beta <- 0           # beta for GP's LCB (i.e., we minimize the amount of generated power changed in sign)
+kernel <- "exp"         # GP's kernel (i.e., 'exp' and 'gauss' in the paper)
+lcb.beta <- 6           # beta for GP's LCB (i.e., we minimize the amount of generated power changed in sign)
 RSsamples <- 1500 # <---- 1500 to be fair w.r.t. PIBO and vanilla BO in the Flow Space (i.e., same number of feasible solutions for the acquisition)
 n0 <- 2*m+1             # initial random solutions (i.e., 2*m+1 is the minimum required) to fit a GP)
 N <- 500                # total number of queries (including initial random solutions)
@@ -62,11 +62,11 @@ for( seed in seeds ) {
     
     P <- maximinLHS(m,2) # LHS in the physical space (i.e., point-clouds)
     
-    Ps <- rbind(Ps,as.vector(P))
+    Ps <- rbind(Ps,as.vector(t(P)))
     evalTime <- Sys.time()
     tmp <- numeric()
     for( k in 1:nfereps )
-      tmp[k] <- permutation_invariant_objective(as.vector(P))
+      tmp[k] <- permutation_invariant_objective(as.vector(t(P)))
     evalTimke <- difftime(Sys.time(),evalTime,units="secs")
     ys[i] <- min(tmp)
     evalTime <- difftime(Sys.time(),evalTime,units="secs")
@@ -104,13 +104,13 @@ for( seed in seeds ) {
       PP <- NULL
       for( jj in 1:RSsamples ) {
         P <- randomLHS(m,2)
-        PP <- rbind( PP, as.vector(P) )
+        PP <- rbind( PP, as.vector(t(P)) )
       }
       
       # selecting only feasible X
       feasibleIxs <- numeric() 
       for( i in 1:nrow(PP) ) {
-        P <- matrix(PP[i,],m,2)
+        P <- matrix(PP[i,],m,2,byrow=T)
         if( sum(dist(P)<rho)==0 )
           feasibleIxs <- c(feasibleIxs,i)
       }
@@ -130,7 +130,7 @@ for( seed in seeds ) {
     evalTime <- Sys.time()
     tmp <- numeric()
     for( k in 1:nfereps )
-      tmp[k] <- permutation_invariant_objective(as.vector(P))
+      tmp[k] <- permutation_invariant_objective(as.vector(t(P)))
     evalTime <- difftime( Sys.time(), evalTime )
     
     Ps <- rbind( Ps, P )
