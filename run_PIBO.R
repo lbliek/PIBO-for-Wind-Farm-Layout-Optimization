@@ -220,6 +220,6 @@ polygon( c(0:(N-n0),(N-n0):0),  c(BS_lo,rev(BS_up)), col=adjustcolor("black",alp
 
 
 cat("> Saving results...")
-if( !dir.exists("RESULTS") )
-  dir.create("RESULTS")
-saveRDS( RES, paste0("RESULTS/results_",length(seeds),"_",kernel,"_",lcb.beta,"_",n0,"_",N,"_",nfereps,".RDS") )
+if( !dir.exists("RESULTS_PIBO") )
+  dir.create("RESULTS_PIBO")
+saveRDS( RES, paste0("RESULTS_PIBO/results_",length(seeds),"_",kernel,"_",lcb.beta,"_",n0,"_",N,"_",nfereps,".RDS") )

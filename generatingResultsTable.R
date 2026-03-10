@@ -1,13 +1,13 @@
 rm(list=ls()); graphics.off(); cat("\014")
 
-folders <- c("RESULTS", "RESULTS_vanilla","RESULTS_vanilla_physical")
+folders <- c("RESULTS_PIBO", "RESULTS_vanilla_BO_on_flows","RESULTS_vanilla_BO_on_pointclouds")
 
 for( folder in folders ) {
   
-  if( folder=="RESULTS" ) {
+  if( folder=="RESULTS_PIBO" ) {
     cat(" [ PIDO ]\n")
   } else {
-    if( folder=="RESULTS_vanilla" ) {
+    if( folder=="RESULTS_vanilla_BO_on_flows" ) {
       cat(" [vannila BO on Flows]\n")
     } else {
       cat(" [vanilla BO on point-clouds (Physical Space) ]\n")
@@ -28,18 +28,15 @@ for( folder in folders ) {
     lcb.beta <- as.numeric(info[4])
     n0 <- as.numeric(info[5])
     N <- as.numeric(info[6])
-    nfeReps <- as.numeric(info[7])
-    pushTheLimit <- info[8]=="TRUE.RDS"
     
     TABLE <- rbind( TABLE, data.frame( nSeeds=nSeeds,
                                        kernel=kernel,
                                        lcb.beta=lcb.beta,
                                        n0=n0,
                                        N=N,
-                                       nfeReps=nfeReps,
-                                       pushTheLimit=pushTheLimit,
-                                       bs_med=round(median(aggr$x),2),
                                        bs_avg=round(mean(aggr$x),2),
+                                       bs_sd=round(sd(aggr$x),2),
+                                       bs_med=round(median(aggr$x),2),
                                        bs_min=round(min(aggr$x),2),
                                        bs_max=round(max(aggr$x),2),
                                        stringsAsFactors=F ))
