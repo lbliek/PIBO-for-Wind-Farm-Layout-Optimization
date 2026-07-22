@@ -5,7 +5,7 @@ folders <- c("RESULTS_PIBO", "RESULTS_vanilla_BO_on_flows","RESULTS_vanilla_BO_o
 for( folder in folders ) {
   
   if( folder=="RESULTS_PIBO" ) {
-    cat(" [ PIDO ]\n")
+    cat(" [ PIBO ]\n")
   } else {
     if( folder=="RESULTS_vanilla_BO_on_flows" ) {
       cat(" [vannila BO on Flows]\n")
@@ -29,6 +29,12 @@ for( folder in folders ) {
     n0 <- as.numeric(info[5])
     N <- as.numeric(info[6])
     
+    aggr_trntime <- aggregate(res$trnTime,by=list(res$seed),sum,na.rm=T)
+    aggr_acqtime <- aggregate(res$acqTime,by=list(res$seed),sum,na.rm=T)
+    aggr_time <- aggregate(res$trnTime+res$acqTime,by=list(res$seed),sum,na.rm=T)
+    # aggr_feasCands <- aggregate(res$nFeasCandidates,by=list(res$seed),mean,na.rm=T)
+    
+    
     TABLE <- rbind( TABLE, data.frame( nSeeds=nSeeds,
                                        kernel=kernel,
                                        lcb.beta=lcb.beta,
@@ -39,6 +45,14 @@ for( folder in folders ) {
                                        bs_med=round(median(aggr$x),2),
                                        bs_min=round(min(aggr$x),2),
                                        bs_max=round(max(aggr$x),2),
+                                       fit_time_avg=mean(aggr_trntime$x),
+                                       fit_time_sd=sd(aggr_trntime$x),
+                                       acq_avg=mean(aggr_acqtime$x),
+                                       acq_time_sd=sd(aggr_acqtime$x),
+                                       fit_acq_time_avg=mean(aggr_time$x),
+                                       fit_acq_time_sd=sd(aggr_time$x),
+                                       # fit_nFeas_avg=mean(aggr_feasCands$x),
+                                       # fit_nFeas_sd=sd(aggr_feasCands$x),
                                        stringsAsFactors=F ))
   }
   

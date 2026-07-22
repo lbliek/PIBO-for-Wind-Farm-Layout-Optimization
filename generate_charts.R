@@ -20,7 +20,7 @@ while( !refOk ) {
 
 
 kern <- "exp"; xi=6 #  best PIBO config!
-seed <- 4
+seed <- 25 # 25 in the best for visualization 
 
 res <- readRDS(paste0("RESULTS_PIBO/results_30_",kern,"_",xi,"_11_500_1.RDS"))
 res <- res[res$seed==seed,]
@@ -44,7 +44,6 @@ for( i in 1:m )
   lines( c(P_[i,1],P[i,1]), c(P_[i,2],P[i,2]), col=clrs[i], lwd=2 )
 legend("topleft",legend=paste("f(P) =",-round(res$y[pibo.ix],2)), cex=2, bty="n" )
 points( P, pch=21, cex=2, bg=clrs )
-
 
 # vanilla BO on flows
 
@@ -90,11 +89,14 @@ points( P, pch=21, cex=2, bg=clrs )
 res <- readRDS(paste0("RESULTS_PIBO/results_30_",kern,"_",xi,"_11_500_1.RDS"))
 minixs <- aggregate( res$y, by=list(res$seed), which.min ); names(minixs) <- c("seed","ix")
 
-pibo.ixs <- aggregate(res$y,by=list(res$seed),which.min)
+nBest <- length(unique(res$seed)) # or a number in [0,length(unique(res$seed))]
+
+pibo.ixs <- aggregate(res$y,by=list(res$seed),which.min) # min because f(x) is negative
 colixs <- grep("x.",names(res),fixed=T)
+ixs <- pibo.ixs$x[order(res$y[pibo.ixs$x],decreasing=F)[1:nBest]]
 Xs <- NULL
-for( i in 1:nrow(pibo.ixs) )
-  Xs <- rbind( Xs, as.numeric(res[pibo.ixs$x[i],colixs]) )
+for( i in ixs )
+  Xs <- rbind( Xs, as.numeric(res[i,colixs]) )
 
 plot( NA, NA, xlim=0:1, ylim=0:1, xlab="", ylab="", main="PIBO", cex.main=2, cex.axis=2 )
 for( i in 1:nrow(Xs) )
@@ -107,11 +109,12 @@ for( i in 1:nrow(Xs) )
 res <- readRDS(paste0("RESULTS_vanilla_BO_on_flows/results_30_",kern,"_",xi,"_11_500_1.RDS"))
 minixs <- aggregate( res$y, by=list(res$seed), which.min ); names(minixs) <- c("seed","ix")
 
-bofl.ixs <- aggregate(res$y,by=list(res$seed),which.min)
+bofl.ixs <- aggregate(res$y,by=list(res$seed),which.min) # min because f(x) is negative
 colixs <- grep("x.",names(res),fixed=T)
+ixs <- bofl.ixs$x[order(res$y[bofl.ixs$x],decreasing=F)[1:nBest]]
 Xs <- NULL
-for( i in 1:nrow(bofl.ixs) )
-  Xs <- rbind( Xs, as.numeric(res[bofl.ixs$x[i],colixs]) )
+for( i in ixs )
+  Xs <- rbind( Xs, as.numeric(res[i,colixs]) )
 
 plot( NA, NA, xlim=0:1, ylim=0:1, main="vanilla BO on flows", cex.main=2, cex.axis=2 )
 for( i in 1:nrow(Xs) )
@@ -124,12 +127,14 @@ for( i in 1:nrow(Xs) )
 res <- readRDS(paste0("RESULTS_vanilla_BO_on_pointclouds/results_30_",kern,"_",xi,"_11_500_1.RDS"))
 minixs <- aggregate( res$y, by=list(res$seed), which.min ); names(minixs) <- c("seed","ix")
 
-bopc.ixs <- aggregate(res$y,by=list(res$seed),which.min)
+bopc.ixs <- aggregate(res$y,by=list(res$seed),which.min) # min because f(x) is negative
 colixs <- grep("x.",names(res),fixed=T)
+ixs <- bopc.ixs$x[order(res$y[bopc.ixs$x],decreasing=F)[1:nBest]]
 Ps <- NULL
-for( i in 1:nrow(bopc.ixs) )
-  Ps <- rbind( Ps, as.numeric(res[bopc.ixs$x[i],colixs]) )
+for( i in ixs )
+  Ps <- rbind( Ps, as.numeric(res[i,colixs]) )
 
 plot( NA, NA, xlim=0:1, ylim=0:1, main="vanilla BO on point-clouds", cex.main=2, cex.axis=2 )
 for( i in 1:nrow(Ps) )
   points( matrix(Ps[i,],m,2,byrow=T), pch=21, cex=3, bg=adjustcolor(clrs,alpha.f=0.6) ) 
+

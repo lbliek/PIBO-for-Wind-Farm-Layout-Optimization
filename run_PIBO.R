@@ -127,10 +127,9 @@ for( seed in seeds ) {
       # selecting only feasible X
       feasibleIxs <- numeric() 
       for( i in 1:nrow(XX) ) {
-        X <- matrix(XX[i,],m,2,byrow=T)
-        DX <- as.matrix(dist(X))
-        ixs <- which(DX<DP_+rho, arr.ind=T)
-        if( nrow(ixs)==m )
+        P <- P_ + matrix(XX[i,],m,2,byrow=T)
+        DP <- as.matrix(dist(P))
+        if( sum(dist(P)<rho)==0 )
           feasibleIxs <- c(feasibleIxs,i)
       }
       toSample <- length(feasibleIxs)==0
