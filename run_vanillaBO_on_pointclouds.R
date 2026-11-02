@@ -62,11 +62,11 @@ for( seed in seeds ) {
     
     P <- maximinLHS(m,2) # LHS in the physical space (i.e., point-clouds)
     
-    Ps <- rbind(Ps,as.vector(t(P)))
+    Ps <- rbind(Ps,as.vector(P))
     evalTime <- Sys.time()
     tmp <- numeric()
     for( k in 1:nfereps )
-      tmp[k] <- permutation_invariant_objective(as.vector(t(P)))
+      tmp[k] <- permutation_invariant_objective(as.vector(P))
     evalTimke <- difftime(Sys.time(),evalTime,units="secs")
     ys[i] <- min(tmp)
     evalTime <- difftime(Sys.time(),evalTime,units="secs")
@@ -104,13 +104,13 @@ for( seed in seeds ) {
       PP <- NULL
       for( jj in 1:RSsamples ) {
         P <- randomLHS(m,2)
-        PP <- rbind( PP, as.vector(t(P)) )
+        PP <- rbind( PP, as.vector(P) )
       }
       
       # selecting only feasible X
       feasibleIxs <- numeric() 
       for( i in 1:nrow(PP) ) {
-        P <- matrix(PP[i,],m,2,byrow=T)
+        P <- matrix(PP[i,],m,2,byrow=F)
         if( sum(dist(P)<rho)==0 )
           feasibleIxs <- c(feasibleIxs,i)
       }
@@ -130,7 +130,7 @@ for( seed in seeds ) {
     evalTime <- Sys.time()
     tmp <- numeric()
     for( k in 1:nfereps )
-      tmp[k] <- permutation_invariant_objective(as.vector(t(P)))
+      tmp[k] <- permutation_invariant_objective(as.vector(P))
     evalTime <- difftime( Sys.time(), evalTime )
     
     Ps <- rbind( Ps, P )

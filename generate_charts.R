@@ -20,13 +20,13 @@ while( !refOk ) {
 
 
 kern <- "exp"; xi=6 #  best PIBO config!
-seed <- 25 # 25 in the best for visualization 
+seed <- 1 # 1 for not crossing PIBO solution
 
 res <- readRDS(paste0("RESULTS_PIBO/results_30_",kern,"_",xi,"_11_500_1.RDS"))
 res <- res[res$seed==seed,]
 pibo.ix <- which.min(res$y)
 
-X <- matrix(as.numeric(res[pibo.ix, grep("x.",names(res),fixed=T)]),m,2,byrow=T)
+X <- matrix(as.numeric(res[pibo.ix, grep("x.",names(res),fixed=T)]),m,2,byrow=F)
 P <- P_ + X
 
 if( m==5 ) {
@@ -45,13 +45,16 @@ for( i in 1:m )
 legend("topleft",legend=paste("f(P) =",-round(res$y[pibo.ix],2)), cex=2, bty="n" )
 points( P, pch=21, cex=2, bg=clrs )
 
+
+
+
 # vanilla BO on flows
 
 res <- readRDS(paste0("RESULTS_vanilla_BO_on_flows/results_30_",kern,"_",xi,"_11_500_1.RDS"))
 res <- res[res$seed==seed,]
 bofl.ix <- which.min(res$y)
 
-X <- matrix(as.numeric(res[bofl.ix, grep("x.",names(res),fixed=T)]),m,2,byrow=T)
+X <- matrix(as.numeric(res[bofl.ix, grep("x.",names(res),fixed=T)]),m,2,byrow=F)
 P <- P_ + X
 
 plot( P_, pch=21, cex=2, bg=clrs, xlim=c(-1,1), ylim=c(-1,1), xlab="", ylab="", main="vanilla BO on flows",
@@ -71,7 +74,7 @@ res <- res[res$seed==seed,]
 bopc.ix <- which.min(res$y)
 
 # contrary to PIBO and vanilla-BO-on-flows, vanilla-BO-on-pointclouds works directly in the Physical Space
-P <- matrix(as.numeric(res[bopc.ix, grep("x.",names(res),fixed=T)]),m,2,byrow=T)
+P <- matrix(as.numeric(res[bopc.ix, grep("x.",names(res),fixed=T)]),m,2,byrow=F)
 
 plot( NA,NA, pch=21, cex=2, bg=clrs, xlim=c(-1,1), ylim=c(-1,1), xlab="", ylab="", main="vanilla BO on point-clouds",
       cex.main=2, cex.axis=2 )
@@ -100,7 +103,7 @@ for( i in ixs )
 
 plot( NA, NA, xlim=0:1, ylim=0:1, xlab="", ylab="", main="PIBO", cex.main=2, cex.axis=2 )
 for( i in 1:nrow(Xs) )
-  points( P_ + matrix(Xs[i,],m,2,byrow=T), pch=21, cex=3, bg=adjustcolor(clrs,alpha.f=0.6) ) 
+  points( P_ + matrix(Xs[i,],m,2,byrow=F), pch=21, cex=3, bg=adjustcolor(clrs,alpha.f=0.6) ) 
 
 
 
@@ -118,7 +121,7 @@ for( i in ixs )
 
 plot( NA, NA, xlim=0:1, ylim=0:1, main="vanilla BO on flows", cex.main=2, cex.axis=2 )
 for( i in 1:nrow(Xs) )
-  points( P_ + matrix(Xs[i,],m,2,byrow=T), pch=21, cex=3, bg=adjustcolor(clrs,alpha.f=0.6) ) 
+  points( P_ + matrix(Xs[i,],m,2,byrow=F), pch=21, cex=3, bg=adjustcolor(clrs,alpha.f=0.6) ) 
 
 
 
@@ -136,5 +139,5 @@ for( i in ixs )
 
 plot( NA, NA, xlim=0:1, ylim=0:1, main="vanilla BO on point-clouds", cex.main=2, cex.axis=2 )
 for( i in 1:nrow(Ps) )
-  points( matrix(Ps[i,],m,2,byrow=T), pch=21, cex=3, bg=adjustcolor(clrs,alpha.f=0.6) ) 
+  points( matrix(Ps[i,],m,2,byrow=F), pch=21, cex=3, bg=adjustcolor(clrs,alpha.f=0.6) ) 
 

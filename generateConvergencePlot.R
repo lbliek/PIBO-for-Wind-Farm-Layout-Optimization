@@ -4,9 +4,12 @@ library(mvtnorm)
 m <- 5        # number of turbines
 rho <- 0.1512 # from 2 * rotor diam / farm length = (2*126)/(333.33*5)
 
-PIBO_res <- readRDS("RESULTS_PIBO/results_30_exp_6_11_500_1.RDS")
-BOfl_res <- readRDS("RESULTS_vanilla_BO_on_flows/results_30_exp_6_11_500_1.RDS")
-BOpc_res <- readRDS("RESULTS_vanilla_BO_on_pointclouds/results_30_exp_6_11_500_1.RDS")
+kernel <- "exp"
+beta <- 6
+
+PIBO_res <- readRDS(paste0("RESULTS_PIBO/results_30_",kernel,"_",beta,"_11_500_1.RDS"))
+BOfl_res <- readRDS(paste0("RESULTS_vanilla_BO_on_flows/results_30_",kernel,"_",beta,"_11_500_1.RDS"))
+BOpc_res <- readRDS(paste0("RESULTS_vanilla_BO_on_pointclouds/results_30_",kernel,"_",beta,"_11_500_1.RDS"))
 hyperopt <- read.table("TPE_RS_WWsorted_surrogate_iters.csv",
                      header=T, sep="," )
 RS_res <- hyperopt[hyperopt$approach=="hyperopt/randomsearch",]
@@ -24,6 +27,7 @@ BOfl_res$y <- -BOfl_res$y
 BOpc_res$y <- -BOpc_res$y
 RS_res$iter_best_fitness <- -RS_res$iter_best_fitness
 TPE_res$iter_best_fitness <- -TPE_res$iter_best_fitness
+
 
 
 PIBObs <- BOflbs <- BOpcbs <- NULL
@@ -55,7 +59,7 @@ BOpcm <- apply(BOpcbs,2,mean); BOpclo <- BOpcm-apply(BOpcbs,2,sd); BOpcup <- BOp
 N <- nrow(PIBO_res)/length(unique(PIBO_res$seed))
 
 RSbs <- TPEbs <- NULL
-for( i in 0:4 ) {
+for( i in (1:length(unique(RS_res$exp_id)))-1 ) {
   RSbs <- rbind( RSbs, RS_res$iter_best_fitness[(i*N+1):((i+1)*N)][-c(1:(2*m+1))] )
   TPEbs <- rbind( TPEbs, TPE_res$iter_best_fitness[(i*N+1):((i+1)*N)][-c(1:(2*m+1))] )
 }
@@ -68,7 +72,7 @@ TPEm <- apply(TPEbs,2,mean); TPElo <- TPEm - apply(TPEbs,2,sd); TPEup <- TPEm + 
 
 par(mar=c(4.1,5.1,1.1,1.1))
 plot( NA, NA, xlim=c(0,length(PIBOm)-1),
-      ylim=c(54,71),
+      ylim=c(63.5,71.5),
       xlab="iterations", ylab="Generated Power", cex.lab=1.5, cex.axis=1.5 )
 polygon( c(1:length(TPEm)-1,rev(1:length(TPEm)-1)), c(TPElo,rev(TPEup)), col=adjustcolor("pink",alpha.f=0.4), border="pink" )         
 polygon( c(1:length(BOpcm)-1,rev(1:length(BOpcm)-1)), c(BOpclo,rev(BOpcup)), col=adjustcolor("orange",alpha.f=0.4), border="orange" )
@@ -106,8 +110,6 @@ legend("bottomright",
 
 
 
-
-
 #****************************************************************************
 
 
@@ -128,4 +130,12 @@ BOpc_time <- BOpc_tt$x + BOpc_at$x
 
 cat("> PIBO - time [secs]:",round(mean(PIBO_time),3),"+/-",round(sd(PIBO_time),3),"\n")
 cat("> vanilla BO on flows - time [secs]:",round(mean(BOfl_time),3),"+/-",round(sd(BOfl_time),3),"\n")
-cat("> vanilla BO on point-clouds - time [secs]:",round(mean(BOpc_time),3),"+/-",round(sd(BOpc_time),3),"\n")
+cat("> vanilla BO on point-clouds - time [secs]:",round(mean(BOpc_time),3),"+/-",round(sd(BOpc_time),3),"\n\n")
+
+cat("> PIBO - GP fitting [secs]:",round(mean(PIBO_tt$x),3),"+/-",round(sd(PIBO_tt$x),3),"\n")
+cat("> vanilla BO on flows - GP fitting [secs]:",round(mean(BOfl_tt$x),3),"+/-",round(sd(BOfl_tt$x),3),"\n")
+cat("> vanilla BO on point-clouds - GP fitting [secs]:",round(mean(BOpc_tt$x),3),"+/-",round(sd(BOpc_tt$x),3),"\n\n")
+
+cat("> PIBO - acquisition time [secs]:",round(mean(PIBO_at$x),3),"+/-",round(sd(PIBO_at$x),3),"\n")
+cat("> vanilla BO on flows - acquisition time [secs]:",round(mean(BOfl_at$x),3),"+/-",round(sd(BOfl_at$x),3),"\n")
+cat("> vanilla BO on point-clouds - acquisition time [secs]:",round(mean(BOpc_at$x),3),"+/-",round(sd(BOpc_at$x),3),"\n")

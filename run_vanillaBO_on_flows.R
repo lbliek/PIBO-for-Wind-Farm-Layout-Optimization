@@ -78,7 +78,7 @@ for( seed in seeds ) {
     evalTime <- Sys.time()
     tmp <- numeric()
     for( k in 1:nfereps )
-      tmp[k] <- permutation_invariant_objective(as.vector(t(P)))
+      tmp[k] <- permutation_invariant_objective(as.vector(P))
     evalTime <- difftime(Sys.time(),evalTime,units="secs")
     ys[i] <- min(tmp)
     
@@ -87,7 +87,7 @@ for( seed in seeds ) {
     # flows in terms of OT
     # *****************************************************************
     
-    Xs <- rbind( Xs, as.vector(t(P-P_)) )
+    Xs <- rbind( Xs, as.vector(P-P_) )
     
     # storing into the data frame
     RES[rowIx,] <- data.frame( seed=seed,
@@ -123,12 +123,12 @@ for( seed in seeds ) {
       
       # rescaling XX w.r.t. to the original search space of P!
       for( j in 1:ncol(XX) )
-        XX[,j] <- XX[,j]-as.vector(t(P_))[j]
+        XX[,j] <- XX[,j]-as.vector(P_)[j]
       
       # selecting only feasible X
       feasibleIxs <- numeric() 
       for( i in 1:nrow(XX) ) {
-        P <- P_ + matrix(XX[i,],m,2,byrow=T)
+        P <- P_ + matrix(XX[i,],m,2,byrow=F)
         DP <- as.matrix(dist(P))
         if( sum(dist(P)<rho)==0 )
           feasibleIxs <- c(feasibleIxs,i)
@@ -143,7 +143,7 @@ for( seed in seeds ) {
     aux <- predict( gp, data.frame(x=XX), "UK" )
     X_next <- XX[which.min(aux$mean-lcb.beta*aux$sd),]
     
-    P <- P_ + matrix(X_next,m,2,byrow=T)
+    P <- P_ + matrix(X_next,m,2,byrow=F)
     
     # *****************************************************************
     # For vanilla BO on flows we do not need to retrieve the optimal
@@ -156,10 +156,10 @@ for( seed in seeds ) {
     evalTime <- Sys.time()
     tmp <- numeric()
     for( k in 1:nfereps )
-      tmp[k] <- permutation_invariant_objective(as.vector(t(P)))
+      tmp[k] <- permutation_invariant_objective(as.vector(P))
     evalTime <- difftime( Sys.time(), evalTime )
     
-    Xs <- rbind( Xs, as.vector(t(P-P_)) )
+    Xs <- rbind( Xs, as.vector(P-P_) )
     ys <- c(ys,min(tmp))
     
     
