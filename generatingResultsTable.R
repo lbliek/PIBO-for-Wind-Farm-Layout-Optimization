@@ -2,6 +2,7 @@ rm(list=ls()); graphics.off(); cat("\014")
 
 folders <- c("RESULTS_PIBO", "RESULTS_vanilla_BO_on_flows","RESULTS_vanilla_BO_on_pointclouds")
 
+
 for( folder in folders ) {
   
   if( folder=="RESULTS_PIBO" ) {
@@ -54,11 +55,15 @@ for( folder in folders ) {
                                        # fit_nFeas_avg=mean(aggr_feasCands$x),
                                        # fit_nFeas_sd=sd(aggr_feasCands$x),
                                        stringsAsFactors=F ))
+    
+    
   }
   
   print(TABLE)
   cat("\n\n")
 }
+
+
 
 
 
